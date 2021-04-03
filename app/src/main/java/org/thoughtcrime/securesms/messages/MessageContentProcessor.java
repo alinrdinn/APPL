@@ -1219,6 +1219,7 @@ public final class MessageContentProcessor {
 
     if (smsMessageId.isPresent() && !message.getGroupContext().isPresent()) {
       threadId = database.updateBundleMessageBody(smsMessageId.get(), body).second();
+      log("Got text message : " + smsMessageId.get() + body);
     } else {
       notifyTypingStoppedFromIncomingMessage(recipient, content.getSender(), content.getSenderDevice());
 
