@@ -380,8 +380,18 @@ public class SmsDatabase extends MessageDatabase {
 
     ContentValues values = new ContentValues();
     values.put(REMOTE_DELETED, 1);
-    values.putNull(BODY);
-    values.putNull(REACTIONS);
+    try{
+      if (getMessageRecord(id).isOutgoing()){
+        values.putNull(BODY);
+        values.putNull(REACTIONS);
+      }else{
+        values.putNull(REACTIONS);
+      }
+    } catch (Exception NoSuchMessageException) {
+      String TAG = "SmsDatabase";
+      String content = "Tidak ada message";
+      Log.i(TAG, content);
+    }
     db.update(TABLE_NAME, values, ID_WHERE, new String[] { String.valueOf(id) });
 
     long threadId = getThreadIdForMessage(id);

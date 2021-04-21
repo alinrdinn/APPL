@@ -44,6 +44,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -164,6 +165,8 @@ public final class ConversationItem extends RelativeLayout implements BindableCo
   @Nullable protected ViewGroup                  contactPhotoHolder;
   @Nullable private   QuoteView                  quoteView;
             private   EmojiTextView              bodyText;
+            private   EmojiTextView              unsendText;
+            private   ImageView                  unsendLine;
             private   ConversationItemFooter     footer;
             private   ConversationItemFooter     stickerFooter;
   @Nullable private   TextView                   groupSender;
@@ -222,6 +225,8 @@ public final class ConversationItem extends RelativeLayout implements BindableCo
     initializeAttributes();
 
     this.bodyText                =            findViewById(R.id.conversation_item_body);
+    this.unsendText              =            findViewById(R.id.conversation_item_body_delete);
+    this.unsendLine              =            findViewById(R.id.unsend_line);
     this.footer                  =            findViewById(R.id.conversation_item_footer);
     this.stickerFooter           =            findViewById(R.id.conversation_item_sticker_footer);
     this.groupSender             =            findViewById(R.id.group_message_sender);
@@ -635,7 +640,6 @@ public final class ConversationItem extends RelativeLayout implements BindableCo
     bodyText.setFocusable(false);
     bodyText.setTextSize(TypedValue.COMPLEX_UNIT_SP, TextSecurePreferences.getMessageBodyTextSize(context));
     bodyText.setMovementMethod(LongClickMovementMethod.getInstance(getContext()));
-
     if (messageRecord.isRemoteDelete()) {
       String deletedMessage = context.getString(messageRecord.isOutgoing() ? R.string.ConversationItem_you_deleted_this_message : R.string.ConversationItem_this_message_was_deleted);
       SpannableString italics = new SpannableString(deletedMessage);
@@ -644,6 +648,18 @@ public final class ConversationItem extends RelativeLayout implements BindableCo
                                               0,
                                               deletedMessage.length(),
                                               Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+      if (!messageRecord.isOutgoing()){
+        String unsendMessage = "Pesan yang dihapus:\n" + conversationMessage.getDisplayBody(getContext()).toString();
+        SpannableString italics1 = new SpannableString(unsendMessage);
+        italics1.setSpan(new StyleSpan(android.graphics.Typeface.ITALIC), 0, unsendMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        italics1.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.signal_text_primary)),
+                0,
+                unsendMessage.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        unsendText.setText(italics1);
+        unsendLine.setVisibility(View.VISIBLE);
+        unsendText.setVisibility(View.VISIBLE);
+      }
 
       bodyText.setText(italics);
       bodyText.setVisibility(View.VISIBLE);
